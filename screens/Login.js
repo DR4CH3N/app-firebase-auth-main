@@ -5,11 +5,26 @@ import { Alert, Button, StyleSheet, TextInput, View } from "react-native";
 import { auth } from "../firebaseConfig";
 
 // importamos as funções de autenticação
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  getAuth,
+  sendPasswordResetEmail,
+} from "firebase/auth";
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+
+  const ResetSenha = () => {
+    sendPasswordResetEmail(auth, email)
+      .then(() => {
+        Alert.alert(
+          "email de recuperação enviado!",
+          "verifique sua caixa de entrada"
+        );
+      })
+      .catch((error) => console.log(error));
+  };
 
   const Login = () => {
     if (!email || !senha) {
@@ -22,7 +37,20 @@ const Login = ({ navigation }) => {
         navigation.navigate("AreaLogada");
       })
       .catch((error) => {
-        console.log(error);
+        let mensagem;
+        switch (error.code) {
+          case "auth/user-not-found":
+            mensagem = "usuario não encontrado!";
+            break;
+          case "auth/wrong-password":
+            mensagem = "senha incorreta";
+            break;
+          default:
+            mensagem = "houve um erro, tente novamente mais tarde";
+            break;
+        }
+
+        Alert.alert("ops!", mensagem);
       });
   };
   return (
@@ -42,6 +70,10 @@ const Login = ({ navigation }) => {
         />
         <View style={estilos.botoes}>
           <Button title="Entre" color="green" onPress={Login} />
+        </View>
+
+        <View style={estilos.botoes}>
+          <Button title="Recuperar senha" color="green" onPress={ResetSenha} />
         </View>
       </View>
     </View>
