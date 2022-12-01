@@ -1,8 +1,17 @@
 import { useState } from "react";
-import { Alert, Button, StyleSheet, TextInput, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Button,
+  StyleSheet,
+  TextInput,
+  View,
+} from "react-native";
 
 // importamos os recursos de autenticação
 import { auth } from "../firebaseConfig";
+
+import Loading from "../src/components/Loading";
 
 // importamos as funções de autenticação
 import {
@@ -15,6 +24,8 @@ import Cadastro from "./Cadastro";
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+
+  const [loading, setLoading] = useState(false);
 
   const ResetSenha = () => {
     sendPasswordResetEmail(auth, email)
@@ -32,9 +43,10 @@ const Login = ({ navigation }) => {
       Alert.alert("atenção!", "Você deve preencher todos os campos");
       return;
     }
-
+    setLoading(true);
     signInWithEmailAndPassword(auth, email, senha)
       .then(() => {
+        setLoading(false);
         navigation.navigate("AreaLogada");
       })
       .catch((error) => {
@@ -52,6 +64,9 @@ const Login = ({ navigation }) => {
         }
 
         Alert.alert("ops!", mensagem);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
   return (
@@ -70,8 +85,15 @@ const Login = ({ navigation }) => {
           onChangeText={(valor) => setSenha(valor)}
         />
         <View style={estilos.botoes}>
-          <Button title="Entre" color="green" onPress={Login} />
+          <Button
+            title="Entre"
+            disabled={loading} // botao desabilita quando o loading se inicia
+            color="green"
+            onPress={Login}
+          />
         </View>
+
+        {loading && <ActivityIndicator size="large" color="green" />}
 
         <View style={estilos.botoes}>
           <Button title="Recuperar senha" color="green" onPress={ResetSenha} />

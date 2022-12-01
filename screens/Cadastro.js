@@ -5,7 +5,7 @@ import { Alert, Button, StyleSheet, TextInput, View } from "react-native";
 import { auth } from "../firebaseConfig"; // config dentro desse repositorio
 import { createUserWithEmailAndPassword } from "firebase/auth"; // biblioteca dentro da firebase
 
-const Cadastro = () => {
+const Cadastro = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
@@ -15,7 +15,47 @@ const Cadastro = () => {
       return;
     }
 
-    createUserWithEmailAndPassword(auth, email, senha);
+    createUserWithEmailAndPassword(auth, email, senha)
+      .then(() => {
+        Alert.alert(
+          "Cadastro",
+          "Contra criada com sucesso! gostaria de entrar?",
+          [
+            {
+              text: "Não, quero ficar aqui!",
+              onPress: () => {
+                return false;
+              },
+              style: "cancel", // SOMENTE NO IOS
+            },
+            {
+              text: "Sim, gostaria de entrar",
+              onPress: () => {
+                navigation.replace("AreaLogada");
+              },
+              style: "destructive", // SOMENTE NO IOS
+            },
+          ]
+        );
+      })
+      .catch((error) => {
+        console.log(error);
+        switch (error.code) {
+          case "auth/email-already-in-use":
+            mensagem = "e-mail ja cadastrado!";
+            break;
+          case "auth/weak-password":
+            mensagem = "Senha deve ter no minimo 6 digitos!";
+            break;
+          case "auth/invalid-email":
+            mensagem = "Endereço de email invalido!";
+            break;
+          default:
+            mensagem = "Algo deu errado... tente novamente!";
+            break;
+        }
+        Alert.alert("Atenção", mensagem);
+      });
   };
 
   return (
