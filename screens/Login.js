@@ -10,6 +10,7 @@ import {
   getAuth,
   sendPasswordResetEmail,
 } from "firebase/auth";
+import Cadastro from "./Cadastro";
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");

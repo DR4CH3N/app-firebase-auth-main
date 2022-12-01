@@ -1,7 +1,23 @@
 import { sendSignInLinkToEmail } from "firebase/auth";
-import { Button, StyleSheet, TextInput, View } from "react-native";
+import { useState } from "react";
+import { Alert, Button, StyleSheet, TextInput, View } from "react-native";
+
+import { auth } from "../firebaseConfig"; // config dentro desse repositorio
+import { createUserWithEmailAndPassword } from "firebase/auth"; // biblioteca dentro da firebase
 
 const Cadastro = () => {
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+
+  const cadastrar = () => {
+    if (!email || !senha) {
+      Alert.alert("atenção!", "voce deve preencher o email e senha!");
+      return;
+    }
+
+    createUserWithEmailAndPassword(auth, email, senha);
+  };
+
   return (
     <View style={estilos.container}>
       <View style={estilos.formulario}>
@@ -18,7 +34,7 @@ const Cadastro = () => {
           onChangeText={(valor) => setSenha(valor)}
         />
         <View style={estilos.botoes}>
-          <Button title="Cadastre-se" color="blue" />
+          <Button title="Cadastre-se" color="blue" onPress={cadastrar} />
         </View>
       </View>
     </View>
