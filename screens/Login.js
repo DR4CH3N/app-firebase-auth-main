@@ -8,95 +8,92 @@ import {
   View,
 } from "react-native";
 
-// importamos os recursos de autenticação
+/* Importamos os recursos de autenticação através das configurações Firebase */
 import { auth } from "../firebaseConfig";
 
-import Loading from "../src/components/Loading";
-
-// importamos as funções de autenticação
+/* Importamos as funções de autenticação diretamente da lib */
 import {
   signInWithEmailAndPassword,
-  getAuth,
   sendPasswordResetEmail,
 } from "firebase/auth";
-import Cadastro from "./Cadastro";
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-
   const [loading, setLoading] = useState(false);
 
-  const ResetSenha = () => {
-    sendPasswordResetEmail(auth, email)
-      .then(() => {
-        Alert.alert(
-          "email de recuperação enviado!",
-          "verifique sua caixa de entrada"
-        );
-      })
-      .catch((error) => console.log(error));
-  };
-
-  const Login = () => {
+  const login = () => {
     if (!email || !senha) {
-      Alert.alert("atenção!", "Você deve preencher todos os campos");
-      return;
+      Alert.alert("Atenção!", "Você deve preencher todos os campos");
+      return; // parar o processo
     }
+
     setLoading(true);
     signInWithEmailAndPassword(auth, email, senha)
       .then(() => {
-        setLoading(false);
-        navigation.navigate("AreaLogada");
+        navigation.replace("AreaLogada");
       })
       .catch((error) => {
+        // console.log(error);
+        // console.log(error.code);
         let mensagem;
         switch (error.code) {
           case "auth/user-not-found":
-            mensagem = "usuario não encontrado!";
+            mensagem = "Usuário não encontrado!";
             break;
           case "auth/wrong-password":
-            mensagem = "senha incorreta";
+            mensagem = "Senha incorreta";
             break;
           default:
-            mensagem = "houve um erro, tente novamente mais tarde";
+            mensagem = "Houve um erro, tente novamente mais tarde";
             break;
         }
-
-        Alert.alert("ops!", mensagem);
+        Alert.alert("Ops!", mensagem);
       })
       .finally(() => {
         setLoading(false);
       });
   };
+
+  const recuperarSenha = () => {
+    sendPasswordResetEmail(auth, email)
+      .then(() => {
+        Alert.alert("Recuperar senha", "Verifique sua caixa de entrada");
+      })
+      .catch((error) => console.log(error));
+  };
+
   return (
     <View style={estilos.container}>
       <View style={estilos.formulario}>
         <TextInput
-          placeholder="E-mail"
           onChangeText={(valor) => setEmail(valor)}
+          placeholder="E-mail"
           style={estilos.input}
           keyboardType="email-address"
         />
         <TextInput
+          onChangeText={(valor) => setSenha(valor)}
           placeholder="Senha"
           style={estilos.input}
           secureTextEntry
-          onChangeText={(valor) => setSenha(valor)}
         />
+
         <View style={estilos.botoes}>
           <Button
+            disabled={loading}
             title="Entre"
-            disabled={loading} // botao desabilita quando o loading se inicia
             color="green"
-            onPress={Login}
+            onPress={login}
           />
-        </View>
 
-        {loading && <ActivityIndicator size="large" color="green" />}
+          {loading && <ActivityIndicator size="large" color="green" />}
 
-        <View style={estilos.botoes}>
-          <Button title="Recuperar senha" color="green" onPress={ResetSenha} />
+          <Button
+            title="Recuperar senha"
+            color="darkgreen"
+            onPress={recuperarSenha}
+          />
         </View>
       </View>
     </View>

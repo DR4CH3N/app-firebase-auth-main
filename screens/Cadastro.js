@@ -1,61 +1,73 @@
-import { sendSignInLinkToEmail } from "firebase/auth";
 import { useState } from "react";
-import { Alert, Button, StyleSheet, TextInput, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Button,
+  StyleSheet,
+  TextInput,
+  View,
+} from "react-native";
 
-import { auth } from "../firebaseConfig"; // config dentro desse repositorio
-import { createUserWithEmailAndPassword } from "firebase/auth"; // biblioteca dentro da firebase
+import { auth } from "../firebaseConfig";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 const Cadastro = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const cadastrar = () => {
     if (!email || !senha) {
-      Alert.alert("atenção!", "voce deve preencher o email e senha!");
+      Alert.alert("Atenção", "Você deve preencher e-mail e senha");
       return;
     }
 
+    setLoading(true);
     createUserWithEmailAndPassword(auth, email, senha)
       .then(() => {
-        Alert.alert(
-          "Cadastro",
-          "Contra criada com sucesso! gostaria de entrar?",
-          [
-            {
-              text: "Não, quero ficar aqui!",
-              onPress: () => {
-                return false;
-              },
-              style: "cancel", // SOMENTE NO IOS
+        Alert.alert("Cadastro", "Conta criada com sucesso!", [
+          {
+            text: "Não, me deixe aqui mesmo",
+            onPress: () => {
+              // setEmail("");
+              // setSenha("");
+              // return false;
+              navigation.replace("Cadastro");
             },
-            {
-              text: "Sim, gostaria de entrar",
-              onPress: () => {
-                navigation.replace("AreaLogada");
-              },
-              style: "destructive", // SOMENTE NO IOS
+            style: "cancel",
+          },
+          {
+            text: "Sim, bora lá!",
+            onPress: () => {
+              navigation.replace("AreaLogada");
             },
-          ]
-        );
+            style: "default",
+          },
+        ]);
       })
       .catch((error) => {
         console.log(error);
+        let mensagem;
         switch (error.code) {
           case "auth/email-already-in-use":
-            mensagem = "e-mail ja cadastrado!";
+            mensagem = "E-mail já cadastrado!";
             break;
+
           case "auth/weak-password":
-            mensagem = "Senha deve ter no minimo 6 digitos!";
+            mensagem = "Senha deve ter pelo menos 6 dígitos!";
             break;
+
           case "auth/invalid-email":
-            mensagem = "Endereço de email invalido!";
+            mensagem = "Endereço de e-mail inválido!";
             break;
+
           default:
             mensagem = "Algo deu errado... tente novamente!";
             break;
         }
-        Alert.alert("Atenção", mensagem);
-      });
+        Alert.alert("Atenção!", mensagem);
+      })
+      .finally(() => setLoading(false));
   };
 
   return (
@@ -74,7 +86,13 @@ const Cadastro = ({ navigation }) => {
           onChangeText={(valor) => setSenha(valor)}
         />
         <View style={estilos.botoes}>
-          <Button title="Cadastre-se" color="blue" onPress={cadastrar} />
+          <Button
+            disabled={loading}
+            onPress={cadastrar}
+            title="Cadastre-se"
+            color="blue"
+          />
+          {loading && <ActivityIndicator size="large" color="blue" />}
         </View>
       </View>
     </View>
