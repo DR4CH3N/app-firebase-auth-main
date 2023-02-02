@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "app-firebase-auth",
-    "slug": "app-firebase-auth",
+    "slug": "app-auth",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -12,7 +12,8 @@
       "backgroundColor": "#ffffff"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/808a810e-5901-4e89-bd86-6f46ff139dee"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -34,6 +35,9 @@
         "projectId": "808a810e-5901-4e89-bd86-6f46ff139dee"
       }
     },
-    "owner": "h3llc4t"
+    "owner": "h3llc4t",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    }
   }
 }
