@@ -15,8 +15,8 @@
       "distribution": "internal",
       "developmentClient": true,
       "android" : {
-      "buildType": "apk",
-      "gradleCommand": ":app:assembleRelease"
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease"
       },
       "ios": {
         "resourceClass": "m1-medium"
